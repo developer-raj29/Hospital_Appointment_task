@@ -12,17 +12,15 @@ import { useNavigate } from "react-router";
 const Navbar = () => {
   const navigate = useNavigate();
 
-  // Safe parse
-  const user = (() => {
-    try {
-      const stored = localStorage.getItem("user");
-      return stored ? JSON.parse(stored) : null;
-    } catch (e) {
-      console.error("Invalid JSON in localStorage 'user':", e);
-      return null;
-    }
-  })();
-
+  let user = null;
+  try {
+    const rawUser = localStorage.getItem("user");
+    user = rawUser ? JSON.parse(rawUser) : null;
+  } catch (e) {
+    console.error("Invalid user data in localStorage");
+    localStorage.removeItem("user");
+  }
+  console.log("user: ", user);
   // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -70,7 +68,7 @@ const Navbar = () => {
                   src={`https://api.dicebear.com/5.x/initials/svg?seed=${user.firstName}${user.lastName}`}
                   alt={`${user.firstName} ${user.lastName}`}
                   sx={{ cursor: "pointer" }}
-                  onClick={() => navigate("/profile")}
+                  onClick={() => navigate(`/profile/${user._id}`)}
                 />
                 <Button
                   onClick={handleLogout}

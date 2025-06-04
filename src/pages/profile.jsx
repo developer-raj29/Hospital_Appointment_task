@@ -11,13 +11,15 @@ import {
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { toast } from "react-toastify";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { useParams } from "react-router";
 
 const Profile = () => {
-  const storedUser = localStorage.getItem("user");
-  const initialUser = storedUser ? JSON.parse(storedUser) : null;
+  const { id } = useParams();
+  console.log("id: ", id);
 
+  const [initialUser, setInitialUser] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -26,54 +28,72 @@ const Profile = () => {
     contactNumber: "",
   });
 
-  useEffect(() => {
-    if (initialUser) {
-      setFormData({
-        firstName: initialUser.firstName || "",
-        lastName: initialUser.lastName || "",
-        age: initialUser.age || "",
-        gender: initialUser.gender || "",
-        contactNumber: initialUser.contactNumber || "",
-      });
-    }
-  }, [initialUser]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCancel = () => {
-    setFormData({
-      firstName: initialUser.firstName,
-      lastName: initialUser.lastName,
-      age: initialUser.age,
-      gender: initialUser.gender,
-      contactNumber: initialUser.contactNumber,
-    });
+    if (initialUser) {
+      setFormData({
+        firstName: initialUser.firstName,
+        lastName: initialUser.lastName,
+        age: initialUser.age,
+        gender: initialUser.gender,
+        contactNumber: initialUser.contactNumber,
+      });
+    }
   };
 
+  const GetUser = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/user/profile/${id}`
+      );
+
+      if (response.data.success) {
+        const user = response.data.user;
+        setInitialUser(user);
+        setFormData({
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          age: user.age || "",
+          gender: user.gender || "",
+          contactNumber: user.contactNumber || "",
+        });
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching profile."
+      );
+    }
+  };
+
+  useEffect(() => {
+    GetUser();
+  }, []);
+
   const submitHandler = async (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
 
     try {
-      const updatedUser = { ...initialUser, ...formData };
-
-      const token = JSON.parse(localStorage.getItem("token")); // optional if using JWT
+      const token = JSON.parse(localStorage.getItem("token"));
+      const updatedUser = { ...formData, _id: id };
 
       const response = await axios.put(
-        `http://localhost:8000/api/user/update-profile`, // Replace with your real endpoint
+        `http://localhost:8000/api/user/update-profile`,
         updatedUser,
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Only if your backend expects a token
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (response.data.success) {
-        // Save updated user data in localStorage
         localStorage.setItem("user", JSON.stringify(response.data.updatedUser));
         toast.success("Profile updated successfully!");
       } else {
@@ -169,7 +189,6 @@ const Profile = () => {
                 variant="contained"
                 color="primary"
                 startIcon={<SaveIcon />}
-                // onClick={handleSave}
               >
                 Save
               </Button>

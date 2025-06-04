@@ -19,7 +19,7 @@ router.delete("/cancel/:id", cancelAppointment); // Cancel appointment by patien
 router.put("/complete/:id", isDoctor, markAsCompleted);
 
 router.get("/all-appointments", auth, getAppointments); // Get all appointments for doctor
-router.get("/doctor", auth, isDoctor, getAppointmentsByDoctor); // Doctor's appointments
-router.get("/patient", auth, isPatient, getAppointmentsByPatient); // Patient's appointments
+router.get("/doctor/:id", auth, isDoctor, getAppointmentsByDoctor); // Doctor's appointments
+router.get("/patient/:id", auth, isPatient, getAppointmentsByPatient); // Patient's appointments
 
 module.exports = router;

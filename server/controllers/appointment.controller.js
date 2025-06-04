@@ -169,7 +169,7 @@ exports.getAppointments = async (req, res) => {
 // Get appointments for the logged-in doctor
 exports.getAppointmentsByDoctor = async (req, res) => {
   try {
-    const doctorId = req.user.id;
+    const doctorId = req.params.id;
 
     const appointments = await Appointment.find({ doctorId })
       .populate(

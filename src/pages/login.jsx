@@ -57,11 +57,12 @@ const Login = () => {
         // Save token in localStorage
         localStorage.setItem("token", JSON.stringify(response.data.token));
         localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("userId", JSON.stringify(response.data.user._id));
 
-        const role = response.data.user.role;
+        const User = response.data.user;
 
         // Conditional Navigation
-        if (role === "Doctor") {
+        if (User.role === "Doctor") {
           navigate("/dashboard/all-patients");
         } else {
           navigate("/dashboard/all-doctors");

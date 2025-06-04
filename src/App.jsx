@@ -5,12 +5,11 @@ import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
 import AllDoctors from "./components/alldoctors";
 import AllPatients from "./components/allpatients";
-import Profile from "./pages/profile";
 import ViewProfile from "./pages/viewprofile";
 import Navbar from "./components/navBar";
 import PrivateRoute from "./components/PrivateRoute";
-import { useState } from "react";
 import Booking from "./pages/booking";
+import Profile from "./pages/profile";
 
 const App = () => {
   // const [isloggedIn, setIsLoggedIn] = useState(false);
@@ -30,13 +29,13 @@ const App = () => {
             </PrivateRoute>
           }
         >
-          <Route path="all-doctors" element={<AllDoctors />} />
-          <Route path="all-patients" element={<AllPatients />} />
+          <Route path="all-doctors/:id" element={<AllDoctors />} />
+          <Route path="all-patients/:id" element={<AllPatients />} />
           <Route path="booking/:id" element={<Booking />} />
         </Route>
 
         <Route
-          path="/profile"
+          path="/profile/:id"
           element={
             <PrivateRoute isloggedIn={true}>
               <Profile />
