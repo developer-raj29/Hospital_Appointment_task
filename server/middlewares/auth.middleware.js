@@ -1,13 +1,20 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/user.model"); // Make sure User model is imported
 require("dotenv").config();
 
 exports.auth = async (req, res, next) => {
   try {
-    // Get token from cookies or headers
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "No token provided",
+      });
+    }
+
     const token =
-      req.cookies?.token ||
-      req.header("Authorization")?.replace("Bearer ", "") ||
-      req.body.token;
+      req.cookies?.token || authHeader.split(" ")[1] || req.body.token;
 
     if (!token) {
       return res.status(401).json({
@@ -15,22 +22,22 @@ exports.auth = async (req, res, next) => {
         message: "Unauthorized: Token missing",
       });
     }
-    console.log("token: ", token);
-    // Verify token
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded; // Attach user info to request
-      next();
-    } catch (err) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid or expired token",
-      });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
     }
+
+    req.user = user; // attach user to request
+    next();
   } catch (error) {
-    return res.status(500).json({
+    return res.status(401).json({
       success: false,
-      message: "Authentication error",
+      message: "Invalid or expired token",
       error: error.message,
     });
   }

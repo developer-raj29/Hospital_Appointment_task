@@ -5,7 +5,7 @@ const User = require("../models/user.model");
 exports.bookAppointment = async (req, res) => {
   try {
     const { doctorId, date, day, timeSlot } = req.body;
-    const patientId = req.user.id;
+    const patientId = req.body.user._id;
 
     if (!doctorId || !date || !day || !timeSlot) {
       return res.status(400).json({

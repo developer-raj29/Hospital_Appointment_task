@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Booking = () => {
   const { id } = useParams(); // doctor ID from URL
@@ -58,6 +59,9 @@ const Booking = () => {
           date,
           day: selectedDay,
           timeSlot: selectedTime, // ✅ renamed
+          user: localStorage.getItem("user")
+            ? JSON.parse(localStorage.getItem("user"))
+            : null,
         },
         {
           headers: {
@@ -68,10 +72,10 @@ const Booking = () => {
       );
 
       if (response.data.success) {
-        alert("Appointment booked successfully!");
+        toast.success("Appointment booked successfully!");
         // Optional: Redirect or reset form
       } else {
-        alert("Booking failed: " + response.data.message);
+        toast.error("Booking failed: " + response.data.message);
       }
     } catch (error) {
       console.error("Booking error:", error);
