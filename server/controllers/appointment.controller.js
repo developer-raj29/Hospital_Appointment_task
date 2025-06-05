@@ -100,36 +100,25 @@ exports.cancelAppointment = async (req, res) => {
   }
 };
 
+// Controller: markAsCompleted
 exports.markAsCompleted = async (req, res) => {
-  try {
-    const appointmentId = req.params.id;
+  const appointmentId = req.params.id;
 
-    const updatedAppointment = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      { status: "completed" },
-      { new: true }
-    );
+  const updatedAppointment = await Appointment.findByIdAndUpdate(
+    appointmentId,
+    { status: "completed" },
+    { new: true }
+  );
 
-    if (!updatedAppointment) {
-      return res.status(404).json({
-        success: false,
-        message: "Appointment not found",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Appointment marked as completed",
-      appointment: updatedAppointment,
-    });
-  } catch (error) {
-    console.error("Mark as completed error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    });
+  if (!updatedAppointment) {
+    return res.status(404).json({ success: false, message: "Not found" });
   }
+
+  return res.status(200).json({
+    success: true,
+    message: "Appointment marked as completed",
+    appointment: updatedAppointment,
+  });
 };
 
 // Get all appointments (admin or staff maybe)

@@ -33,6 +33,7 @@ exports.auth = async (req, res, next) => {
     }
 
     req.user = user; // attach user to request
+    // console.log("Checking role for user:", req.user);
     next();
   } catch (error) {
     return res.status(401).json({

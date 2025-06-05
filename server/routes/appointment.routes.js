@@ -16,7 +16,7 @@ const { isDoctor, isPatient } = require("../middlewares/role.middleware");
 // Protected Routes
 router.post("/booking", isPatient, bookAppointment); // Book new appointment by patient
 router.delete("/cancel/:id", cancelAppointment); // Cancel appointment by patient
-router.put("/complete/:id", isDoctor, markAsCompleted);
+router.put("/complete/:id", auth, isDoctor, markAsCompleted);
 
 router.get("/all-appointments", auth, getAppointments); // Get all appointments for doctor
 router.get("/doctor/:id", auth, isDoctor, getAppointmentsByDoctor); // Doctor's appointments
