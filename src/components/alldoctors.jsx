@@ -21,33 +21,35 @@ const AllDoctors = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          console.error("No token found, please login");
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get(
-          "http://localhost:8000/api/user/all-doctors",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setDoctors(response.data.doctors || []);
-      } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } finally {
+  const fetchDoctors = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found, please login");
         setLoading(false);
+        return;
       }
-    };
 
+      const response = await axios.get(
+        "http://localhost:8000/api/user/all-doctors",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("response: ", response);
+
+      setDoctors(response.data.doctors || []);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDoctors();
   }, []);
 

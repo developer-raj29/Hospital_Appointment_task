@@ -35,6 +35,7 @@ const AllPatients = () => {
           },
         }
       );
+      console.log("response: ", response);
 
       setPatients(response.data.patients || []);
     } catch (error) {

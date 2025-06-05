@@ -12,7 +12,7 @@ import Booking from "./pages/booking";
 import Profile from "./pages/profile";
 
 const App = () => {
-  // const [isloggedIn, setIsLoggedIn] = useState(false);
+  const isloggedIn = !!localStorage.getItem("token");
 
   return (
     <>
@@ -21,35 +21,39 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute isloggedIn={true}>
+            <PrivateRoute isloggedIn={isloggedIn}>
               <Dashboard />
             </PrivateRoute>
           }
         >
-          <Route path="all-doctors/:id" element={<AllDoctors />} />
-          <Route path="all-patients/:id" element={<AllPatients />} />
+          <Route path="all-doctors" element={<AllDoctors />} />
+          <Route path="all-patients" element={<AllPatients />} />
           <Route path="booking/:id" element={<Booking />} />
         </Route>
 
         <Route
           path="/profile/:id"
           element={
-            <PrivateRoute isloggedIn={true}>
+            <PrivateRoute isloggedIn={isloggedIn}>
               <Profile />
             </PrivateRoute>
           }
         />
+
         <Route
-          path="/view-profile"
+          path="/view-profile/:id"
           element={
-            <PrivateRoute isloggedIn={true}>
+            <PrivateRoute isloggedIn={isloggedIn}>
               <ViewProfile />
             </PrivateRoute>
           }
         />
+
+        <Route path="*" element={<h2>404 - Page Not Found</h2>} />
       </Routes>
     </>
   );

@@ -8,17 +8,19 @@ import {
   Button,
   Stack,
   MenuItem,
+  IconButton,
+  Divider,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams } from "react-router";
 
 const Profile = () => {
   const { id } = useParams();
-  console.log("id: ", id);
-
   const [initialUser, setInitialUser] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -26,11 +28,53 @@ const Profile = () => {
     age: "",
     gender: "",
     contactNumber: "",
+    email: "",
+    specialization: "",
+    availability: [],
   });
+
+  const isDoctor = initialUser?.role === "Doctor";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvailabilityChange = (index, field, value) => {
+    const updated = [...formData.availability];
+    updated[index][field] = value;
+    setFormData((prev) => ({ ...prev, availability: updated }));
+  };
+
+  const handleSlotChange = (index, slotIndex, value) => {
+    const updated = [...formData.availability];
+    updated[index].slots[slotIndex] = value;
+    setFormData((prev) => ({ ...prev, availability: updated }));
+  };
+
+  const addAvailabilityDay = () => {
+    setFormData((prev) => ({
+      ...prev,
+      availability: [...prev.availability, { day: "", slots: [""] }],
+    }));
+  };
+
+  const removeAvailabilityDay = (index) => {
+    const updated = [...formData.availability];
+    updated.splice(index, 1);
+    setFormData((prev) => ({ ...prev, availability: updated }));
+  };
+
+  const addSlot = (index) => {
+    const updated = [...formData.availability];
+    updated[index].slots.push("");
+    setFormData((prev) => ({ ...prev, availability: updated }));
+  };
+
+  const removeSlot = (dayIndex, slotIndex) => {
+    const updated = [...formData.availability];
+    updated[dayIndex].slots.splice(slotIndex, 1);
+    setFormData((prev) => ({ ...prev, availability: updated }));
   };
 
   const handleCancel = () => {
@@ -40,7 +84,10 @@ const Profile = () => {
         lastName: initialUser.lastName,
         age: initialUser.age,
         gender: initialUser.gender,
+        email: initialUser.email,
         contactNumber: initialUser.contactNumber,
+        specialization: initialUser.specialization || "",
+        availability: initialUser.availability || [],
       });
     }
   };
@@ -50,7 +97,6 @@ const Profile = () => {
       const response = await axios.get(
         `http://localhost:8000/api/user/profile/${id}`
       );
-
       if (response.data.success) {
         const user = response.data.user;
         setInitialUser(user);
@@ -59,15 +105,14 @@ const Profile = () => {
           lastName: user.lastName || "",
           age: user.age || "",
           gender: user.gender || "",
+          email: user.email || "",
           contactNumber: user.contactNumber || "",
+          specialization: user.specialization || "",
+          availability: user.availability || [],
         });
       }
     } catch (error) {
-      console.error("Fetch error:", error);
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong while fetching profile."
-      );
+      toast.error("Failed to fetch profile.");
     }
   };
 
@@ -77,14 +122,16 @@ const Profile = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-
     try {
       const token = JSON.parse(localStorage.getItem("token"));
-      const updatedUser = { ...formData, _id: id };
+      const payload = {
+        ...formData,
+        _id: id,
+      };
 
       const response = await axios.put(
         `http://localhost:8000/api/user/update-profile`,
-        updatedUser,
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -100,100 +147,192 @@ const Profile = () => {
         toast.error(response.data.message || "Update failed.");
       }
     } catch (error) {
-      console.error("Update error:", error);
-      toast.error(
-        error.response?.data?.message || "Something went wrong while updating."
-      );
+      toast.error("Something went wrong while updating.");
     }
   };
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-      bgcolor="#f0f4f8"
-      px={2}
-    >
-      <Card
-        sx={{ maxWidth: 500, width: "100%", borderRadius: 4, boxShadow: 4 }}
-      >
+    <Box display="flex" justifyContent="center" py={5} px={2}>
+      <Card sx={{ maxWidth: 950, width: "100%", p: 3, borderRadius: 4 }}>
         <CardContent>
-          <Typography variant="h5" align="center" fontWeight="bold" mb={2}>
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            align="center"
+            gutterBottom
+          >
             Edit Profile
           </Typography>
 
-          <Box
-            component="form"
-            onSubmit={submitHandler}
-            noValidate
-            autoComplete="off"
-            sx={{ mt: 2 }}
-          >
+          <form onSubmit={submitHandler}>
             <Stack spacing={2}>
-              <TextField
-                label="First Name"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                fullWidth
-              />
-              <TextField
-                label="Last Name"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                fullWidth
-              />
-              <TextField
-                label="Age"
-                name="age"
-                type="number"
-                value={formData.age}
-                onChange={handleChange}
-                fullWidth
-              />
-              <TextField
-                label="Gender"
-                name="gender"
-                select
-                value={formData.gender}
-                onChange={handleChange}
-                fullWidth
-              >
-                <MenuItem value="male">Male</MenuItem>
-                <MenuItem value="female">Female</MenuItem>
-                <MenuItem value="other">Other</MenuItem>
-              </TextField>
-              <TextField
-                label="Contact Number"
-                name="contactNumber"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Stack>
+              <Box display={"flex"} gap={2}>
+                <TextField
+                  label="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  fullWidth
+                />
+                <TextField
+                  label="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  fullWidth
+                />
 
-            <Box display="flex" justifyContent="space-between" mt={4}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                startIcon={<CancelIcon />}
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                startIcon={<SaveIcon />}
-              >
-                Save
-              </Button>
-            </Box>
-          </Box>
+                <TextField
+                  label="Age"
+                  name="age"
+                  type="number"
+                  value={formData.age}
+                  onChange={handleChange}
+                  fullWidth
+                />
+
+                <TextField
+                  label="Gender"
+                  name="gender"
+                  select
+                  value={formData.gender}
+                  onChange={handleChange}
+                  fullWidth
+                >
+                  <MenuItem value="male">Male</MenuItem>
+                  <MenuItem value="female">Female</MenuItem>
+                  <MenuItem value="other">Other</MenuItem>
+                </TextField>
+              </Box>
+              <Box display={"flex"} gap={2}>
+                <TextField
+                  label="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  fullWidth
+                />
+
+                <TextField
+                  label="Contact Number"
+                  name="contactNumber"
+                  value={formData.contactNumber}
+                  onChange={handleChange}
+                  fullWidth
+                />
+
+                {isDoctor && (
+                  <TextField
+                    label="Specialization"
+                    name="specialization"
+                    value={formData.specialization}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                )}
+              </Box>
+
+              {isDoctor && (
+                <>
+                  <Typography variant="h6" mt={2}>
+                    Availability
+                  </Typography>
+
+                  {formData.availability.map((dayObj, index) => (
+                    <Box
+                      key={index}
+                      sx={{ p: 2, border: "1px solid #ccc", borderRadius: 2 }}
+                    >
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <TextField
+                          label="Day"
+                          value={dayObj.day}
+                          onChange={(e) =>
+                            handleAvailabilityChange(
+                              index,
+                              "day",
+                              e.target.value
+                            )
+                          }
+                        />
+                        <IconButton
+                          onClick={() => removeAvailabilityDay(index)}
+                          color="error"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Stack>
+
+                      <Box display={"flex"} flexWrap={"wrap"} gap={3}>
+                        {dayObj.slots.map((slot, sIndex) => (
+                          <Stack
+                            direction="row"
+                            spacing={2}
+                            alignItems="center"
+                            key={sIndex}
+                            mt={1}
+                          >
+                            <TextField
+                              label={`Slot ${sIndex + 1}`}
+                              value={slot}
+                              onChange={(e) =>
+                                handleSlotChange(index, sIndex, e.target.value)
+                              }
+                            />
+                            <IconButton
+                              onClick={() => removeSlot(index, sIndex)}
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Stack>
+                        ))}
+                      </Box>
+
+                      <Button
+                        variant="outlined"
+                        onClick={() => addSlot(index)}
+                        startIcon={<AddCircleOutlineIcon />}
+                        sx={{ mt: 1 }}
+                      >
+                        Add Slot
+                      </Button>
+                    </Box>
+                  ))}
+
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={addAvailabilityDay}
+                    startIcon={<AddCircleOutlineIcon />}
+                  >
+                    Add Availability Day
+                  </Button>
+                </>
+              )}
+
+              <Divider sx={{ my: 3 }} />
+
+              <Box display="flex" justifyContent="space-between">
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  startIcon={<CancelIcon />}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<SaveIcon />}
+                >
+                  Save
+                </Button>
+              </Box>
+            </Stack>
+          </form>
         </CardContent>
       </Card>
     </Box>
