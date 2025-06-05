@@ -4,22 +4,23 @@ This is a full-stack MERN-based Hospital Appointment Management System. It allow
 
 ## 📁 Project Structure
 ```bash
-├── public/ # Frontend built with React + Vite + MUI
-├── server/ # Backend built with Node.js + Express + MongoDB
-├── src
-|   ├── assets
-|   ├── compoents
-|   ├── pages
-|   ├── App.jsx
-|   ├── index.css
-|   └──  main.jsx
+hospital-appointment-system/
+├── public/                 # Static assets for frontend
+├── server/                # Backend (Node.js + Express + MongoDB)
+├── src/                   # React frontend source code
+│   ├── assets/            # Images and static resources
+│   ├── components/        # Reusable UI components (Note: typo fixed)
+│   ├── pages/             # Route-based page components
+│   ├── App.jsx            # Main App component
+│   ├── index.css          # Global styles
+│   └── main.jsx           # Entry point for React (Vite)
 ├── .gitignore
 ├── README.md
 ├── eslint.config.js
 ├── index.html
 ├── package-lock.json
 ├── package.json
-└── vite.config.js
+└── vite.config.js         # Vite configuration
 ```
 
 ## 🚀 Getting Started
