@@ -124,9 +124,7 @@ const Signup = () => {
       }
     } catch (error) {
       console.error("Signup error:", error);
-      toast.error(
-        error.response?.data?.message || "Something went wrong during Signup"
-      );
+      toast.error(error.response?.data?.message);
     }
   };
 
