@@ -3,9 +3,24 @@
 This is a full-stack MERN-based Hospital Appointment Management System. It allows patients to book appointments with doctors, and doctors to manage appointments via a dashboard interface.
 
 ## 📁 Project Structure
-├── client/ # Frontend built with React + Vite + MUI /n
+```bash
+├── public/ # Frontend built with React + Vite + MUI
 ├── server/ # Backend built with Node.js + Express + MongoDB
-└── README.md
+├── src
+|   ├── assets
+|   ├── compoents
+|   ├── pages
+|   ├── App.jsx
+|   ├── index.css
+|   └──  main.jsx
+├── .gitignore
+├── README.md
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+└── vite.config.js
+```
 
 ## 🚀 Getting Started
 
